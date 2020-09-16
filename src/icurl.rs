@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 use std::collections::VecDeque;
 
+#[derive(Debug)]
 enum HttpMethod {
     GET,
     POST,
@@ -8,6 +9,7 @@ enum HttpMethod {
 
 impl HttpMethod {
     fn new(method: &str) -> Option<HttpMethod> {
+        println!("HttpMethod new");
         match method {
             "GET" => Some(HttpMethod::GET),
             "POST" => Some(HttpMethod::POST),
@@ -32,9 +34,17 @@ impl State {
     pub fn new(matches: ArgMatches) -> State {
         let url = matches.value_of("url").map(String::from);
 
-        let method: Option<HttpMethod> = match matches.value_of("method") {
-            Some(method) => HttpMethod::new(method),
-            _ => None,
+        // TODO: Need Refactoring
+        let method: Option<HttpMethod> = if matches.is_present("method") {
+            if matches.is_present("GET") {
+                Some(HttpMethod::GET)
+            } else if matches.is_present("POST") {
+                Some(HttpMethod::POST)
+            } else {
+                None
+            }
+        } else {
+            None
         };
 
         let is_highlight = matches.is_present("highlight");
@@ -70,12 +80,46 @@ impl Icurl {
         }
     }
 
-    pub fn pop_front_action(&mut self) {
-        self.stack.pop_front();
+    pub fn run_action(&mut self) {
+        loop {
+            let action = self.pop_front_action();
+
+            match action {
+                Some(Action::SET_URL) => self.set_url(),
+                Some(Action::SET_HTTP_METHOD) => self.set_http_method(),
+                _ => break,
+            }
+        }
     }
 
-    pub fn pop_back_action(&mut self) {
-        self.stack.pop_back();
+    fn set_url(&mut self) {
+        println!("Please input access url: ");
+        let mut word = String::new();
+        std::io::stdin().read_line(&mut word).ok();
+        let answer = word.trim().to_string();
+
+        self.state.url = Some(answer);
+
+        println!("{:?}", self.state.url);
+    }
+
+    fn set_http_method(&mut self) {
+        println!("Set a http method: ");
+        let mut word = String::new();
+        std::io::stdin().read_line(&mut word).ok();
+        let answer = word.trim();
+
+        self.state.method = HttpMethod::new(answer);
+
+        println!("{:?}", self.state.method);
+    }
+
+    pub fn pop_front_action(&mut self) -> Option<Action> {
+        self.stack.pop_front()
+    }
+
+    pub fn pop_back_action(&mut self) -> Option<Action> {
+        self.stack.pop_back()
     }
 
     pub fn push_front_action(&mut self, action: Action) {
