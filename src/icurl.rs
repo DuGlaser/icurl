@@ -116,6 +116,7 @@ impl Icurl {
         let answer = word.trim().to_string();
 
         self.state.url = Some(answer);
+        println!();
     }
 
     fn set_http_method(&mut self) {
@@ -125,6 +126,7 @@ impl Icurl {
         let answer = word.trim();
 
         self.state.method = HttpMethod::new(answer);
+        println!();
     }
 
     fn set_theme(&mut self) {
