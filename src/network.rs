@@ -8,7 +8,7 @@ use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
 pub fn request(icurl: &Icurl) {
     let body = match icurl.state.method {
         Some(HttpMethod::GET) => get_request(icurl),
-        Some(HttpMethod::POST) => get_request(icurl),
+        Some(HttpMethod::POST) => post_request(icurl),
         _ => panic!("Undifiend http method"),
     };
 
