@@ -120,13 +120,13 @@ impl Icurl {
         println!("> Set a http method");
         let mut word = String::new();
         std::io::stdin().read_line(&mut word).ok();
-        let answer = word.trim();
+        let answer = word.trim().to_uppercase();
 
         if answer == "POST" {
             self.push_front_action(Action::SET_REQUEST_BODY);
         }
 
-        self.state.method = HttpMethod::new(answer);
+        self.state.method = HttpMethod::new(&answer);
         println!();
     }
 
