@@ -1,13 +1,10 @@
-use clap::ArgMatches;
-use std::collections::VecDeque;
+use crate::network::request;
 
-use syntect::easy::HighlightLines;
-use syntect::highlighting::{Style, ThemeSet};
-use syntect::parsing::SyntaxSet;
-use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
+use clap::ArgMatches;
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug)]
-enum HttpMethod {
+pub enum HttpMethod {
     GET,
     POST,
 }
@@ -26,13 +23,14 @@ impl HttpMethod {
 pub enum Action {
     SET_URL,
     SET_HTTP_METHOD,
-    SET_THEME,
+    SET_REQUEST_BODY,
 }
 
-struct State {
-    url: Option<String>,
-    method: Option<HttpMethod>,
-    is_highlight: bool,
+pub struct State {
+    pub url: Option<String>,
+    pub method: Option<HttpMethod>,
+    pub is_highlight: bool,
+    pub request_body: HashMap<String, String>,
 }
 
 impl State {
@@ -42,9 +40,9 @@ impl State {
         // TODO: Need Refactoring
         let method: Option<HttpMethod> = if matches.is_present("method") {
             if matches.is_present("GET") {
-                Some(HttpMethod::GET)
+                HttpMethod::new("GET")
             } else if matches.is_present("POST") {
-                Some(HttpMethod::POST)
+                HttpMethod::new("POST")
             } else {
                 None
             }
@@ -53,20 +51,20 @@ impl State {
         };
 
         let is_highlight = matches.is_present("highlight");
+        let request_body = HashMap::new();
 
         State {
             url,
             method,
             is_highlight,
+            request_body,
         }
     }
 }
 
 pub struct Icurl {
-    state: State,
+    pub state: State,
     stack: VecDeque<Action>,
-    syntax_set: Option<SyntaxSet>,
-    theme_set: Option<ThemeSet>,
 }
 
 impl Icurl {
@@ -74,22 +72,21 @@ impl Icurl {
         Icurl {
             state: State::new(matches),
             stack: VecDeque::new(),
-            syntax_set: None,
-            theme_set: None,
         }
     }
 
     pub fn stack_action(&mut self) {
-        if self.state.is_highlight {
-            self.stack.push_back(Action::SET_THEME);
-        }
-
         if self.state.url.is_none() {
             self.stack.push_back(Action::SET_URL);
         }
 
         if self.state.method.is_none() {
             self.stack.push_back(Action::SET_HTTP_METHOD);
+        } else {
+            match self.state.method {
+                Some(HttpMethod::POST) => self.stack.push_back(Action::SET_REQUEST_BODY),
+                _ => println!("Undifiend http method"),
+            }
         }
     }
 
@@ -99,14 +96,14 @@ impl Icurl {
             let action = self.pop_front_action();
 
             match action {
-                Some(Action::SET_THEME) => self.set_theme(),
                 Some(Action::SET_URL) => self.set_url(),
                 Some(Action::SET_HTTP_METHOD) => self.set_http_method(),
+                Some(Action::SET_REQUEST_BODY) => self.set_request_body(),
                 _ => break,
             }
         }
 
-        self.request();
+        request(self);
     }
 
     fn set_url(&mut self) {
@@ -123,54 +120,51 @@ impl Icurl {
         println!("> Set a http method");
         let mut word = String::new();
         std::io::stdin().read_line(&mut word).ok();
-        let answer = word.trim();
+        let answer = word.trim().to_uppercase();
 
-        self.state.method = HttpMethod::new(answer);
+        if answer == "POST" {
+            self.push_front_action(Action::SET_REQUEST_BODY);
+        }
+
+        self.state.method = HttpMethod::new(&answer);
         println!();
     }
 
-    fn set_theme(&mut self) {
-        self.syntax_set = Some(SyntaxSet::load_defaults_newlines());
-        self.theme_set = Some(ThemeSet::load_defaults());
-    }
+    fn set_request_body(&mut self) {
+        println!("> Please input key");
+        let mut word = String::new();
+        std::io::stdin().read_line(&mut word).ok();
+        let keys = word.trim().to_string();
 
-    #[tokio::main]
-    async fn request(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let resp = reqwest::get(&self.state.url.clone().unwrap()).await?;
-        let body = resp.text().await?.to_string();
+        let keys_v: Vec<&str> = keys.split(",").collect();
+        println!();
 
-        if self.state.is_highlight && self.syntax_set.is_some() && self.theme_set.is_some() {
-            let syntax_set = std::mem::replace(&mut self.syntax_set, None).unwrap();
-            let theme_set = std::mem::replace(&mut self.theme_set, None).unwrap();
+        for key_i in keys_v.iter() {
+            let key = key_i.trim().to_string();
+            println!("> {}", key);
 
-            let syntax = syntax_set.find_syntax_by_extension("html").unwrap();
-            let mut h = HighlightLines::new(syntax, &theme_set.themes["base16-ocean.dark"]);
-            for line in LinesWithEndings::from(&body) {
-                let ranges: Vec<(Style, &str)> = h.highlight(line, &syntax_set);
-                let escaped = as_24_bit_terminal_escaped(&ranges[..], false);
-                print!("{}", escaped);
-            }
-        } else {
-            for line in LinesWithEndings::from(&body) {
-                print!("{}", line);
-            }
+            let mut word = String::new();
+            std::io::stdin().read_line(&mut word).ok();
+            let value = word.trim().to_string();
+
+            self.state.request_body.insert(key, value);
+            println!();
         }
-        Ok(())
     }
 
-    pub fn pop_front_action(&mut self) -> Option<Action> {
+    fn pop_front_action(&mut self) -> Option<Action> {
         self.stack.pop_front()
     }
 
-    pub fn pop_back_action(&mut self) -> Option<Action> {
+    fn pop_back_action(&mut self) -> Option<Action> {
         self.stack.pop_back()
     }
 
-    pub fn push_front_action(&mut self, action: Action) {
+    fn push_front_action(&mut self, action: Action) {
         self.stack.push_front(action);
     }
 
-    pub fn push_back_action(&mut self, action: Action) {
+    fn push_back_action(&mut self, action: Action) {
         self.stack.push_back(action);
     }
 }

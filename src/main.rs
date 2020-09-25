@@ -2,6 +2,7 @@
 extern crate clap;
 
 mod icurl;
+mod network;
 
 use clap::{App, Arg, ArgGroup};
 fn main() {
