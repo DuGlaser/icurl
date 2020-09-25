@@ -1,6 +1,7 @@
 use crate::network::request;
 
 use clap::ArgMatches;
+use dialoguer::{theme::ColorfulTheme, Input, Select};
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug)]
@@ -16,6 +17,12 @@ impl HttpMethod {
             "POST" => Some(HttpMethod::POST),
             _ => None,
         }
+    }
+
+    // TODO: Need Refactoring
+    fn vec() -> Vec<String> {
+        let v = vec![String::from("GET"), String::from("POST")];
+        return v;
     }
 }
 
@@ -65,6 +72,7 @@ impl State {
 pub struct Icurl {
     pub state: State,
     stack: VecDeque<Action>,
+    theme: ColorfulTheme,
 }
 
 impl Icurl {
@@ -72,6 +80,7 @@ impl Icurl {
         Icurl {
             state: State::new(matches),
             stack: VecDeque::new(),
+            theme: ColorfulTheme::default(),
         }
     }
 
@@ -107,48 +116,48 @@ impl Icurl {
     }
 
     fn set_url(&mut self) {
-        println!("> Please input access url");
-        let mut word = String::new();
-        std::io::stdin().read_line(&mut word).ok();
-        let answer = word.trim().to_string();
+        let url: String = Input::with_theme(&self.theme)
+            .with_prompt("URL")
+            .interact()
+            .unwrap();
 
-        self.state.url = Some(answer);
-        println!();
+        self.state.url = Some(url);
     }
 
     fn set_http_method(&mut self) {
-        println!("> Set a http method");
-        let mut word = String::new();
-        std::io::stdin().read_line(&mut word).ok();
-        let answer = word.trim().to_uppercase();
+        let methods = HttpMethod::vec();
 
-        if answer == "POST" {
+        let method_index = Select::with_theme(&self.theme)
+            .with_prompt("Method")
+            .default(0)
+            .items(&methods[..])
+            .interact()
+            .unwrap();
+
+        if methods[method_index] == "POST" {
             self.push_front_action(Action::SET_REQUEST_BODY);
         }
 
-        self.state.method = HttpMethod::new(&answer);
-        println!();
+        self.state.method = HttpMethod::new(&methods[method_index]);
     }
 
     fn set_request_body(&mut self) {
-        println!("> Please input key");
-        let mut word = String::new();
-        std::io::stdin().read_line(&mut word).ok();
-        let keys = word.trim().to_string();
+        let keys: String = Input::with_theme(&self.theme)
+            .with_prompt("Keys")
+            .interact()
+            .unwrap();
 
         let keys_v: Vec<&str> = keys.split(",").collect();
-        println!();
 
         for key_i in keys_v.iter() {
             let key = key_i.trim().to_string();
-            println!("> {}", key);
 
-            let mut word = String::new();
-            std::io::stdin().read_line(&mut word).ok();
-            let value = word.trim().to_string();
+            let value: String = Input::with_theme(&self.theme)
+                .with_prompt(format!("  {}", &key))
+                .interact()
+                .unwrap();
 
             self.state.request_body.insert(key, value);
-            println!();
         }
     }
 
