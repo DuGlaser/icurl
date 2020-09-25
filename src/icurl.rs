@@ -152,18 +152,22 @@ impl Icurl {
         }
     }
 
+    #[allow(dead_code)]
     fn pop_front_action(&mut self) -> Option<Action> {
         self.stack.pop_front()
     }
 
+    #[allow(dead_code)]
     fn pop_back_action(&mut self) -> Option<Action> {
         self.stack.pop_back()
     }
 
+    #[allow(dead_code)]
     fn push_front_action(&mut self, action: Action) {
         self.stack.push_front(action);
     }
 
+    #[allow(dead_code)]
     fn push_back_action(&mut self, action: Action) {
         self.stack.push_back(action);
     }
