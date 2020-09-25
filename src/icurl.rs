@@ -134,17 +134,22 @@ impl Icurl {
         println!("> Please input key");
         let mut word = String::new();
         std::io::stdin().read_line(&mut word).ok();
-        let key = word.trim().to_string();
+        let keys = word.trim().to_string();
 
+        let keys_v: Vec<&str> = keys.split(",").collect();
         println!();
-        println!("> Please input value");
-        let mut word = String::new();
-        std::io::stdin().read_line(&mut word).ok();
-        let value = word.trim().to_string();
 
-        self.state.request_body.insert(key, value);
+        for key_i in keys_v.iter() {
+            let key = key_i.trim().to_string();
+            println!("> {}", key);
 
-        println!();
+            let mut word = String::new();
+            std::io::stdin().read_line(&mut word).ok();
+            let value = word.trim().to_string();
+
+            self.state.request_body.insert(key, value);
+            println!();
+        }
     }
 
     fn pop_front_action(&mut self) -> Option<Action> {
