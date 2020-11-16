@@ -1,4 +1,3 @@
 # icurl
 [WIP] Interactive cURL
-
-[![asciicast](https://asciinema.org/a/c2uRnATMvaZ06K0zSoDFkcNYE.svg)](https://asciinema.org/a/c2uRnATMvaZ06K0zSoDFkcNYE)
+[![asciicast](https://asciinema.org/a/Fw9pndAcqj5tX1BGfukkpifIW.svg)](https://asciinema.org/a/Fw9pndAcqj5tX1BGfukkpifIW)
