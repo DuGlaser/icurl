@@ -25,7 +25,7 @@ func executor(t string) {
 		}
 	}
 
-	fmt.Print("cmd: ")
+	fmt.Print("cmd: curl ")
 	for _, a := range arg {
 		fmt.Printf("%s ", a)
 	}
