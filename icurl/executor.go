@@ -29,7 +29,7 @@ func Excutor(t string) {
 			var buf bytes.Buffer
 			json.Compac(&buf, content)
 
-			arg[i] = fmt.Sprintf("\"%s\"", buf.String())
+			arg[i] = fmt.Sprintf("'%s'", buf.String())
 		}
 	}
 
