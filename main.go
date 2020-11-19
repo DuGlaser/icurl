@@ -40,28 +40,15 @@ func executor(t string) {
 	return
 }
 
-func completer(in prompt.Document) []prompt.Suggest {
-	s := []prompt.Suggest{
-		{Text: "-X GET", Description: "HTTP GET method"},
-		{Text: "-X POST", Description: "HTTP POST method"},
-		{Text: "-X DELETE", Description: "HTTP DELETE method"},
-		{Text: "-X PATCH", Description: "HTTP PATCH method"},
-		{Text: "-X PUT", Description: "HTTP PUT method"},
-		{Text: "-d", Description: "HTTP POST data"},
-		{Text: "-I", Description: "Show document info only"},
-		{Text: "-v", Description: "Make the operation more talkative"},
-		{Text: "-h", Description: "This help text"},
-		{Text: "-H", Description: "Pass custom header(s) to server"},
-		{Text: "\"Content-Type: application/json\""},
-		{Text: "--editor", Description: "Open editor"},
-	}
-	return prompt.FilterFuzzy(s, in.GetWordBeforeCursor(), true)
-}
-
 func main() {
+	c, err := icurl.NewCompleter()
+	if err != nil {
+		panic(err)
+	}
+
 	p := prompt.New(
 		executor,
-		completer,
+		c.Complete,
 		prompt.OptionPrefix(">>> curl "),
 		prompt.OptionTitle("icurl"),
 	)
