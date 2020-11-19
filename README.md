@@ -5,7 +5,7 @@
 
 ## Installation
 ```bash
-$ go get -u github.com/DuGlaser/icurl
+$ go get github.com/DuGlaser/icurl
 ```
 
 ## License
