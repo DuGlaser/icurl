@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/DuGlaser/icurl/editor"
+	"github.com/DuGlaser/icurl/icurl"
 	"github.com/c-bata/go-prompt"
 )
 
@@ -17,7 +17,7 @@ func executor(t string) {
 
 	for i, a := range arg {
 		if a == "--editor" {
-			content, _ := editor.Launch()
+			content, _ := icurl.Launch()
 			var buf bytes.Buffer
 			json.Compac(&buf, content)
 
