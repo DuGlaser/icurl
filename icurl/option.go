@@ -2,7 +2,7 @@ package icurl
 
 import "github.com/c-bata/go-prompt"
 
-func optionCompleter(d prompt.Document) []prompt.Suggest {
+func OptionCompleter(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "--abstract-unix-socket ", Description: "Connect via abstract Unix domain socket"},
 		{Text: "--alt-svc", Description: "Enable alt-svc with this cache file"},
