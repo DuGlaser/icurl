@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func Launch() ([]byte, error) {
+func launch() ([]byte, error) {
 	fPath, err := ioutil.TempFile("", "data*.json")
 	if err != nil {
 		fmt.Fprint(os.Stdout, fmt.Sprintf("failed make edit file. %s\n", err.Error()))

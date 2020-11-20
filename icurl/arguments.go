@@ -2,7 +2,7 @@ package icurl
 
 import "github.com/c-bata/go-prompt"
 
-func HttpMethodArguments(d prompt.Document) []prompt.Suggest {
+func httpMethodArguments(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "GET", Description: "HTTP GET method"},
 		{Text: "POST", Description: "HTTP POST method"},

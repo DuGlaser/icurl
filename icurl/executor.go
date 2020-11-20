@@ -25,7 +25,7 @@ func Excutor(t string) {
 
 	for i, a := range arg {
 		if a == "--editor" {
-			content, _ := Launch()
+			content, _ := launch()
 			var buf bytes.Buffer
 			json.Compac(&buf, content)
 

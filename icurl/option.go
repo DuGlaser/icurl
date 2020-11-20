@@ -2,7 +2,7 @@ package icurl
 
 import "github.com/c-bata/go-prompt"
 
-func OptionCompleter(d prompt.Document) []prompt.Suggest {
+func optionCompleter(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "--abstract-unix-socket ", Description: "Connect via abstract Unix domain socket"},
 		{Text: "--alt-svc", Description: "Enable alt-svc with this cache file"},
@@ -230,7 +230,7 @@ func OptionCompleter(d prompt.Document) []prompt.Suggest {
 	return prompt.FilterFuzzy(s, d.GetWordBeforeCursor(), true)
 }
 
-func ShortOptionCompleter(d prompt.Document) []prompt.Suggest {
+func shortOptionCompleter(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "", Description: ""},
 		{Text: "-a", Description: "Append to target file when uploading"},

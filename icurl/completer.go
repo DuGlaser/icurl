@@ -27,11 +27,11 @@ func (c *Completer) Complete(d prompt.Document) []prompt.Suggest {
 	}
 
 	if strings.HasPrefix(w, "--") {
-		return OptionCompleter(d)
+		return optionCompleter(d)
 	}
 
 	if strings.HasPrefix(w, "-") {
-		return ShortOptionCompleter(d)
+		return shortOptionCompleter(d)
 	}
 
 	if s, f := c.completeOptionArguments(d); f {
@@ -63,7 +63,7 @@ func (c *Completer) completeOptionArguments(d prompt.Document) ([]prompt.Suggest
 
 	switch option {
 	case "-X", "--request":
-		return HttpMethodArguments(d), true
+		return httpMethodArguments(d), true
 
 	case "-d", "--data":
 		return []prompt.Suggest{{Text: "--editor", Description: "Open the editor"}}, true
