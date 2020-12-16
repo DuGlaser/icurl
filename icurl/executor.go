@@ -41,7 +41,6 @@ func Excutor(t string) {
 	fmt.Println()
 
 	s := strings.Join(arg, " ")
-	fmt.Println(s)
 
 	cmd := exec.Command("/bin/sh", "-c", "curl "+s)
 	cmd.Stdin = os.Stdin
