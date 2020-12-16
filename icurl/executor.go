@@ -40,10 +40,17 @@ func Excutor(t string) {
 	fmt.Println()
 	fmt.Println()
 
-	cmd := exec.Command("curl", arg...)
+	s := strings.Join(arg, " ")
+	fmt.Println(s)
+
+	cmd := exec.Command("/bin/sh", "-c", "curl "+s)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Got error: %s\n", err.Error())
+	}
+	fmt.Println()
+	fmt.Println()
 	return
 }
