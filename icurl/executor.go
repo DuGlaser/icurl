@@ -27,7 +27,7 @@ func Excutor(t string) {
 		if a == "--editor" {
 			content, _ := launch()
 			var buf bytes.Buffer
-			json.Compac(&buf, content)
+			json.Compact(&buf, content)
 
 			arg[i] = fmt.Sprintf("'%s'", buf.String())
 		}
